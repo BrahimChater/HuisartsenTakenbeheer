@@ -22,11 +22,11 @@ def initialize_db():
         # Query to create a table "patienten" in the database
         query_pt = """
         CREATE TABLE IF NOT EXISTS patienten (
-            id,
-            naam,
-            geboorte_datum,
-            telefoon,
-            opmerkingen
+            id INTEGER PRIMARY KEY,
+            naam TEXT NOT NULL,
+            geboorte_datum TEXT NOT NULL,
+            telefoon TEXT,
+            opmerkingen TEXT
             )
         """
         
@@ -36,15 +36,17 @@ def initialize_db():
         # Query to create a table "taken" in the database
         query_taken = """
         CREATE TABLE IF NOT EXISTS taken (
-            id,
-            patient_id,
-            omschrijving,
-            datum_aanmaak,
-            prioriteit,
-            deadline,
-            status,
-            voltooid_op,
-            opmerkingen_afhandeling
+            id INTEGER PRIMARY KEY,
+            patient_id INTEGER NOT NULL,
+            omschrijving TEXT NOT NULL,
+            datum_aanmaak TEXT,
+            prioriteit TEXT DEFAULT 'normaal',
+            deadline TEXT,
+            status TEXT NOT NULL DEFAULT 'lopende',
+            voltooid_op TEXT,
+            opmerkingen_afhandeling TEXT,
+            FOREIGN KEY(patient_id)
+            REFERENCES patienten(id)
             )
         """
         

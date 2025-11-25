@@ -46,3 +46,12 @@ class Taak:
            f"Voltooid op: {self.voltooid_op}\n"
            f"Conclusie: {self.opmerkingen_afhandeling}\n"
         )
+           
+if __name__ =="__main__":
+   # Kleine test
+   p = Patient(1, "Patient Zero", "1980-01-01", "0123456789", "Benzodependentie")
+   print(p)
+
+   t = Taak(1, 1,"Verwijsbrief cardiologie maken","2025-11-22","2025-11-30",
+       prioriteit="hoog",status="lopende")
+   print(t)

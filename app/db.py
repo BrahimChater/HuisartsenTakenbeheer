@@ -62,24 +62,48 @@ def add_patient(naam, geboorte_datum, telefoon, opmerkingen="/"):
     #Makes sure the database and tables exist
     initialize_db()
     
-    #Insert the values into the table
+    #Insert the values into the table if patient doesn't exist yet
     with sqlite3.connect(db_full_path) as db:
         my_cursor = db.cursor()
-        query = """
-        INSERT INTO patienten (naam, geboorte_datum, telefoon, opmerkingen)
-        VALUES (?,?,?,?)
+        
+        
+        #Does the patient exist?
+        check_query = """
+        SELECT id
+        FROM patienten
+        WHERE naam = ? AND geboorte_datum = ?
         """
         
-        input_values = (naam, geboorte_datum, telefoon, opmerkingen)
+        check_values = (naam, geboorte_datum)
         
-        my_cursor.execute(query,input_values)
-        db.commit()
+        my_cursor.execute(check_query,check_values)
         
-        #With INTEGER PRIMARY KEY for id an integer id was automatically created by SQLite
-        # Lastrowid returns the id
-        return my_cursor.lastrowid
+        existing_patient = my_cursor.fetchone()
+        
+        #If the patient already exists, the id of the existing one is returned
+        if existing_patient is not None:
+            print("Deze patient zit al in de database! Er wordt niks toegevoegd.")
+            return existing_patient[0]
+        
+        # If the patient doesn't exist then a new entry is created and its id returned
+        else:         
+             query = """
+             INSERT INTO patienten (naam, geboorte_datum, telefoon, opmerkingen)
+             VALUES (?,?,?,?)
+             """
+        
+             input_values = (naam, geboorte_datum, telefoon, opmerkingen)
+        
+             my_cursor.execute(query,input_values)
+             db.commit()
+        
+             #With INTEGER PRIMARY KEY for id an integer id was automatically created by SQLite
+             # Lastrowid returns the id
+             return my_cursor.lastrowid
 
-#Defines a function to get all patients from the database in the form of a list of tuples
+
+
+#Defines a function to get all patient entries from the database and return them as a list of patient objects
 def get_all_patients():
     
     #Makes sure the database and tables exist

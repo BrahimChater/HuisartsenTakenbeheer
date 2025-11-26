@@ -1,6 +1,6 @@
 import sqlite3
 import os
-
+from models import Patient
 
 # Assigns the desired database folder, file and full path to a variable
 db_path = "data"
@@ -56,9 +56,10 @@ def initialize_db():
         db.commit()
         
 
-#Defines a function to add a patient to the database:
-def add_patient(self, naam, geboorte_datum, telefoon, opmerkingen="/"):
-    #Makes sure the database and tables exist:
+#Defines a function to add a patient to the database
+def add_patient(naam, geboorte_datum, telefoon, opmerkingen="/"):
+    
+    #Makes sure the database and tables exist
     initialize_db()
     
     #Insert the values into the table
@@ -78,9 +79,55 @@ def add_patient(self, naam, geboorte_datum, telefoon, opmerkingen="/"):
         # Lastrowid returns the id
         return my_cursor.lastrowid
 
+#Defines a function to get all patients from the database in the form of a list of tuples
+def get_all_patients():
+    
+    #Makes sure the database and tables exist
+    initialize_db()
+    
+    #Select all patient entries, fetch them and return them as a list of patient objects
+    
+    with sqlite3.connect(db_full_path) as db:
+        my_cursor = db.cursor()
+        query="""
+        SELECT id, naam, geboorte_datum, telefoon, opmerkingen FROM patienten
+        """
+        
+        my_cursor.execute(query)
+        rows = my_cursor.fetchall()
+        
+        patients=[]
+        for row in rows:
+            id = row[0]
+            naam = row[1]
+            geboorte_datum = row[2]
+            telefoon = row[3]
+            opmerkingen = row[4]
+            
+            pt = Patient(id,naam, geboorte_datum,telefoon,opmerkingen)
+            patients.append(pt)
+        
+        return patients
+        
 
 
-
+# Testing the code
 if __name__ == "__main__":
     initialize_db()
     print(f"Het databasebestand {db_file} en tabellen zijn aangemaakt in map: {db_path} ")
+    
+    # Test: Add a patient
+    add_patient("Patient Zero", "1950-01-01", "0123456789","Test Patient")
+    
+    #Test: Get and print all patient entries
+    
+    patients = get_all_patients()
+    for p in patients:
+        print(p)
+    
+    
+    
+    
+    
+    
+    

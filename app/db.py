@@ -133,7 +133,46 @@ def get_all_patients():
         
         return patients
         
-
+#Defines a function to add a task to the database
+def add_task(patient_id, omschrijving, datum_aanmaak, deadline, prioriteit="normaal", status="lopende", voltooid_op="niet voltooid", opmerkingen_afhandeling="/"):
+    
+    #Makes sure the database and tables exist
+    initialize_db()
+    
+    with sqlite3.connect(db_full_path) as db:
+        my_cursor = db.cursor()
+        
+        #Check if task doesnt exist yet
+        check_query="""
+        SELECT id
+        FROM taken
+        WHERE patient_id = ? AND datum_aanmaak = ? AND omschrijving = ? 
+        """
+        
+        check_values = (patient_id, datum_aanmaak, omschrijving)
+        my_cursor.execute(check_query,check_values)
+        existing_task = my_cursor.fetchone()
+        
+        #If the task exists return its id
+        if existing_task is not None:
+            print('Deze taak werd reeds ingevoerd.')
+            return existing_task[0]
+        #If the task doesnt exist, created it and return its id
+        else:
+            query ="""
+            INSERT INTO taken (patient_id, omschrijving, datum_aanmaak, deadline, prioriteit, status, voltooid_op, opmerkingen_afhandeling)
+            VALUES (?,?,?,?,?,?,?,?)
+            """
+            input_values = (patient_id, omschrijving, datum_aanmaak,deadline,prioriteit,status,voltooid_op,opmerkingen_afhandeling)
+            
+            my_cursor.execute(query, input_values)
+            
+            db.commit()
+            
+            #With INTEGER PRIMARY KEY for id an integer id was automatically created by SQLite
+            # Lastrowid returns the id
+            return my_cursor.lastrowid
+            
 
 # Testing the code
 if __name__ == "__main__":

@@ -56,6 +56,31 @@ def initialize_db():
         db.commit()
         
 
+#Defines a function to add a patient to the database:
+def add_patient(self, naam, geboorte_datum, telefoon, opmerkingen="/"):
+    #Makes sure the database and tables exist:
+    initialize_db()
+    
+    #Insert the values into the table
+    with sqlite3.connect(db_full_path) as db:
+        my_cursor = db.cursor()
+        query = """
+        INSERT INTO patienten (naam, geboorte_datum, telefoon, opmerkingen)
+        VALUES (?,?,?,?)
+        """
+        
+        input_values = (naam, geboorte_datum, telefoon, opmerkingen)
+        
+        my_cursor.execute(query,input_values)
+        db.commit()
+        
+        #With INTEGER PRIMARY KEY for id an integer id was automatically created by SQLite
+        # Lastrowid returns the id
+        return my_cursor.lastrowid
+
+
+
+
 if __name__ == "__main__":
     initialize_db()
     print(f"Het databasebestand {db_file} en tabellen zijn aangemaakt in map: {db_path} ")

@@ -1,6 +1,6 @@
 import sqlite3
 import os
-from models import Patient
+from models import Patient, Taak
 
 # Assigns the desired database folder, file and full path to a variable
 db_path = "data"
@@ -13,12 +13,12 @@ def initialize_db():
     # If the directory "data" doesn't exist it should first be created
     if not os.path.exists(db_path):
         os.makedirs(db_path, exist_ok=True)
-    
-    #Create a database if it doesn't exist yet and connect it. 
-    #Then create a cursor object
+
+    # Create a database if it doesn't exist yet and connect it.
+    # Then create a cursor object
     with sqlite3.connect(db_full_path) as db:
         my_cursor = db.cursor()
-    
+
         # Query to create a table "patienten" in the database
         query_pt = """
         CREATE TABLE IF NOT EXISTS patienten (
@@ -29,10 +29,10 @@ def initialize_db():
             opmerkingen TEXT
             )
         """
-        
+
         # Create the table "patienten"
         my_cursor.execute(query_pt)
-    
+
         # Query to create a table "taken" in the database
         query_taken = """
         CREATE TABLE IF NOT EXISTS taken (
@@ -49,138 +49,201 @@ def initialize_db():
             REFERENCES patienten(id)
             )
         """
-        
+
         # Create the table "taken"
         my_cursor.execute(query_taken)
-        # Commit the changes to the database     
+        # Commit the changes to the database
         db.commit()
-        
 
-#Defines a function to add a patient to the database
+
+# Defines a function to add a patient to the database
 def add_patient(naam, geboorte_datum, telefoon, opmerkingen="/"):
-    
-    #Makes sure the database and tables exist
+
+    # Makes sure the database and tables exist
     initialize_db()
-    
-    #Insert the values into the table if patient doesn't exist yet
+
+    # Insert the values into the table if patient doesn't exist yet
     with sqlite3.connect(db_full_path) as db:
         my_cursor = db.cursor()
-        
-        
-        #Does the patient exist?
+
+        # Does the patient exist?
         check_query = """
         SELECT id
         FROM patienten
         WHERE naam = ? AND geboorte_datum = ?
         """
-        
+
         check_values = (naam, geboorte_datum)
-        
-        my_cursor.execute(check_query,check_values)
-        
+
+        my_cursor.execute(check_query, check_values)
+
         existing_patient = my_cursor.fetchone()
-        
-        #If the patient already exists, the id of the existing one is returned
+
+        # If the patient already exists, the id of the existing one is returned
         if existing_patient is not None:
             print("Deze patient zit al in de database! Er wordt niks toegevoegd.")
             return existing_patient[0]
-        
+
         # If the patient doesn't exist then a new entry is created and its id returned
-        else:         
+        else:
              query = """
              INSERT INTO patienten (naam, geboorte_datum, telefoon, opmerkingen)
              VALUES (?,?,?,?)
              """
-        
+
              input_values = (naam, geboorte_datum, telefoon, opmerkingen)
-        
-             my_cursor.execute(query,input_values)
+
+             my_cursor.execute(query, input_values)
              db.commit()
-        
-             #With INTEGER PRIMARY KEY for id an integer id was automatically created by SQLite
+
+             # With INTEGER PRIMARY KEY for id an integer id was automatically created by SQLite
              # Lastrowid returns the id
              return my_cursor.lastrowid
 
 
-
-#Defines a function to get all patient entries from the database and return them as a list of patient objects
+# Defines a function to get all patient entries from the database and return them as a list of patient objects
 def get_all_patients():
-    
-    #Makes sure the database and tables exist
+
+    # Makes sure the database and tables exist
     initialize_db()
-    
-    #Select all patient entries, fetch them and return them as a list of patient objects
-    
+
+    # Select all patient entries, fetch them and return them as a list of patient objects
+
     with sqlite3.connect(db_full_path) as db:
         my_cursor = db.cursor()
-        query="""
+        query = """
         SELECT id, naam, geboorte_datum, telefoon, opmerkingen FROM patienten
         """
-        
+
         my_cursor.execute(query)
         rows = my_cursor.fetchall()
-        
-        patients=[]
+
+        patients = []
         for row in rows:
             id = row[0]
             naam = row[1]
             geboorte_datum = row[2]
             telefoon = row[3]
             opmerkingen = row[4]
-            
-            pt = Patient(id,naam, geboorte_datum,telefoon,opmerkingen)
+
+            pt = Patient(id, naam, geboorte_datum, telefoon, opmerkingen)
             patients.append(pt)
-        
+
         return patients
-        
-#Defines a function to add a task to the database
+
+# Defines a function to add a task to the database
+
+
 def add_task(patient_id, omschrijving, datum_aanmaak, deadline, prioriteit="normaal", status="lopende", voltooid_op="niet voltooid", opmerkingen_afhandeling="/"):
-    
-    #Makes sure the database and tables exist
+
+    # Makes sure the database and tables exist
     initialize_db()
-    
+
     with sqlite3.connect(db_full_path) as db:
         my_cursor = db.cursor()
-        
-        #Check if task doesnt exist yet
-        check_query="""
+
+        # Check if task doesnt exist yet
+        check_query = """
         SELECT id
         FROM taken
-        WHERE patient_id = ? AND datum_aanmaak = ? AND omschrijving = ? 
+        WHERE patient_id = ? AND datum_aanmaak = ? AND omschrijving = ?
         """
-        
+
         check_values = (patient_id, datum_aanmaak, omschrijving)
-        my_cursor.execute(check_query,check_values)
+        my_cursor.execute(check_query, check_values)
         existing_task = my_cursor.fetchone()
-        
-        #If the task exists return its id
+
+        # If the task exists return its id
         if existing_task is not None:
             print('Deze taak werd reeds ingevoerd.')
             return existing_task[0]
-        #If the task doesnt exist, created it and return its id
+        # If the task doesnt exist, created it and return its id
         else:
-            query ="""
+            query = """
             INSERT INTO taken (patient_id, omschrijving, datum_aanmaak, deadline, prioriteit, status, voltooid_op, opmerkingen_afhandeling)
             VALUES (?,?,?,?,?,?,?,?)
             """
-            input_values = (patient_id, omschrijving, datum_aanmaak,deadline,prioriteit,status,voltooid_op,opmerkingen_afhandeling)
-            
+            input_values = (patient_id, omschrijving, datum_aanmaak, deadline,
+                            prioriteit, status, voltooid_op, opmerkingen_afhandeling)
+
             my_cursor.execute(query, input_values)
-            
+
             db.commit()
-            
-            #With INTEGER PRIMARY KEY for id an integer id was automatically created by SQLite
+
+            # With INTEGER PRIMARY KEY for id an integer id was automatically created by SQLite
             # Lastrowid returns the id
             return my_cursor.lastrowid
-            
+
+
+# Defines a function to get all tasks for a patient from the database and return them as a list of task objects
+def get_all_tasks_for_patient(patient_id):
+
+    # Makes sure the database and tables exist
+    initialize_db()
+
+    # Select all task entries for a patient, fetch them and return them as a list of task objects
+
+    with sqlite3.connect(db_full_path) as db:
+        my_cursor = db.cursor()
+        query = """
+        SELECT id, patient_id, omschrijving, datum_aanmaak,
+        deadline, prioriteit, status, voltooid_op, opmerkingen_afhandeling
+        FROM taken
+        WHERE patient_id = ?
+        """
+
+
+        my_cursor.execute(query, (patient_id,))
+        rows = my_cursor.fetchall()
+
+        tasks = []
+        for row in rows:
+            id = row[0]
+            patient_id = row[1]
+            omschrijving = row[2]
+            datum_aanmaak = row[3]
+            deadline = row[4]
+            prioriteit = row[5]
+            status = row[6]
+            voltooid_op = row[7]
+            opmerkingen_afhandeling = row[8]
+
+            taak = Taak(
+               id,
+               patient_id,
+               omschrijving,
+               datum_aanmaak,
+               deadline,
+               prioriteit,
+               status,
+               voltooid_op,
+               opmerkingen_afhandeling,
+            )
+            tasks.append(taak)
+
+        return tasks
+
 
 # Testing the code
 if __name__ == "__main__":
     initialize_db()
-    print(f"Het databasebestand {db_file} en tabellen zijn aangemaakt in map: {db_path} ")
-    
+    print(
+        f"Het databasebestand {db_file} en tabellen zijn aangemaakt in map: {db_path} ")
+
     # Test: Add a patient
-    add_patient("Patient Zero", "1950-01-01", "0123456789","Test Patient")
+    a = add_patient("Patient Zero", "1950-01-01", "0123456789", "Test Patient")
+
+    # Test: Add a task for that patient
+    b = add_task(
+       patient_id=a,
+       omschrijving="Verwijsbrief cardiologie maken",
+       datum_aanmaak="2025-11-22",
+       deadline="2025-11-30",
+       prioriteit="hoog",
+    )
+    print(f"Taak {b} toegevoegd voor patiënt {a}")
+   
+
     
     #Test: Get and print all patient entries
     
@@ -188,7 +251,11 @@ if __name__ == "__main__":
     for p in patients:
         print(p)
     
-    
+    # Test: Get and print all tasks for this patient
+    tasks = get_all_tasks_for_patient(a)
+    for t in tasks:
+        print(t)
+
     
     
     

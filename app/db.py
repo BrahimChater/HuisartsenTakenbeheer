@@ -99,6 +99,32 @@ def add_patient(naam, geboorte_datum, telefoon, opmerkingen="/"):
              # With INTEGER PRIMARY KEY for id an integer id was automatically created by SQLite
              # Lastrowid returns the id
              return my_cursor.lastrowid
+         
+            
+# Defines a function to update a patient
+def update_patient(id, naam, geboorte_datum, telefoon, opmerkingen="/"):
+    
+    # Makes sure the database and tables exist
+    initialize_db()
+    
+    #Update the table patienten for a given id
+    with sqlite3.connect(db_full_path) as db:
+        my_cursor = db.cursor()
+        
+        query="""
+        UPDATE patienten
+        SET naam = ?,
+            geboorte_datum = ?,
+            telefoon = ?,
+            opmerkingen =?
+        WHERE id = ?
+        """
+        
+        input_values = (naam, geboorte_datum, telefoon, opmerkingen, id)
+        
+        my_cursor.execute(query,input_values)
+        db.commit()
+        
 
 
 # Defines a function to get all patient entries from the database and return them as a list of patient objects
@@ -131,9 +157,8 @@ def get_all_patients():
 
         return patients
 
+
 # Defines a function to add a task to the database
-
-
 def add_task(patient_id, omschrijving, datum_aanmaak, deadline, prioriteit="normaal", status="lopende", voltooid_op="niet voltooid", opmerkingen_afhandeling="/"):
 
     # Makes sure the database and tables exist
@@ -173,6 +198,45 @@ def add_task(patient_id, omschrijving, datum_aanmaak, deadline, prioriteit="norm
             # With INTEGER PRIMARY KEY for id an integer id was automatically created by SQLite
             # Lastrowid returns the id
             return my_cursor.lastrowid
+
+# Defines a function to update a task
+def update_task(id, patient_id, omschrijving, datum_aanmaak, deadline, prioriteit="normaal", status="lopende", voltooid_op="niet voltooid", opmerkingen_afhandeling="/"):
+    
+    # Makes sure the database and tables exist
+    initialize_db()
+    
+    #Update the table taken for a given id
+    with sqlite3.connect(db_full_path) as db:
+        my_cursor = db.cursor()
+        
+        query="""
+        UPDATE taken
+        SET patient_id = ?,
+            omschrijving = ?,
+            datum_aanmaak = ?,
+            deadline = ?,
+            prioriteit = ?,
+            status = ?,
+            voltooid_op = ?,
+            opmerkingen_afhandeling = ?
+        WHERE id = ?
+        """
+        
+        input_values = (
+            patient_id,
+            omschrijving,
+            datum_aanmaak,
+            deadline,
+            prioriteit,
+            status,
+            voltooid_op,
+            opmerkingen_afhandeling,
+            id,
+        )
+        
+        my_cursor.execute(query,input_values)
+        db.commit()
+
 
 
 # Defines a function to get all tasks for a patient from the database and return them as a list of task objects

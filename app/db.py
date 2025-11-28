@@ -249,19 +249,78 @@ def add_task(patient_id, omschrijving, datum_aanmaak, deadline, prioriteit="norm
             # Lastrowid returns the id
             return my_cursor.lastrowid
 
-# Defines a function to update a task
-
-
-def update_task(id, patient_id, omschrijving, datum_aanmaak, deadline, prioriteit="normaal", status="lopende", voltooid_op="niet voltooid", opmerkingen_afhandeling="/"):
+# Defines a function to update a task.  Only the selected fields will be updated
+def update_task(id, patient_id=None, omschrijving=None, datum_aanmaak=None, deadline=None, prioriteit=None, status=None, voltooid_op=None, opmerkingen_afhandeling=None):
 
     # Makes sure the database and tables exist
     initialize_db()
 
-    # Update the table taken for a given id
+    #Update the table taken for a task with a given id
     with sqlite3.connect(db_full_path) as db:
         my_cursor = db.cursor()
+        
+        # 1. Select the row from the database you want to update
+        query_select = """
+        SELECT patient_id, omschrijving, datum_aanmaak, deadline, prioriteit, status, voltooid_op, opmerkingen_afhandeling
+        FROM taken
+        WHERE id= ?
+        """
 
-        query = """
+        input_value = (id,)
+
+        my_cursor.execute(query_select, input_value)
+
+        selected_row = my_cursor.fetchone()
+
+        if selected_row is None:
+            print("Geen taak gevonden met dit id!")
+            return None
+
+        #2. Assign the newly updated values
+        current_patient_id = selected_row[0]
+        current_omschrijving = selected_row[1]
+        current_datum_aanmaak = selected_row[2]
+        current_deadline = selected_row[3]
+        current_prioriteit = selected_row[4]
+        current_status = selected_row[5]
+        current_voltooid_op = selected_row[6]
+        current_opmerkingen_afhandeling = selected_row[7]
+        
+        if patient_id is None:
+            new_patient_id = current_patient_id
+        else:
+            new_patient_id = patient_id
+        if omschrijving is None:
+            new_omschrijving = current_omschrijving
+        else:
+            new_omschrijving = omschrijving
+        if datum_aanmaak is None:
+            new_datum_aanmaak = current_datum_aanmaak
+        else:
+            new_datum_aanmaak = datum_aanmaak
+        if deadline is None:
+            new_deadline = current_deadline
+        else:
+            new_deadline = deadline
+        if prioriteit is None:
+            new_prioriteit = current_prioriteit
+        else:
+            new_prioriteit = prioriteit
+        if status is None:
+            new_status = current_status
+        else: 
+            new_status = status
+        if voltooid_op is None:
+            new_voltooid_op = current_voltooid_op
+        else:
+            new_voltooid_op = voltooid_op
+        if opmerkingen_afhandeling is None:
+            new_opmerkingen_afhandeling = current_opmerkingen_afhandeling
+        else:
+            new_opmerkingen_afhandeling = opmerkingen_afhandeling
+            
+        #3. Update the table taken for the given id with the updates values
+        query_update = """
         UPDATE taken
         SET patient_id = ?,
             omschrijving = ?,
@@ -275,18 +334,18 @@ def update_task(id, patient_id, omschrijving, datum_aanmaak, deadline, prioritei
         """
 
         input_values = (
-            patient_id,
-            omschrijving,
-            datum_aanmaak,
-            deadline,
-            prioriteit,
-            status,
-            voltooid_op,
-            opmerkingen_afhandeling,
+            new_patient_id,
+            new_omschrijving,
+            new_datum_aanmaak,
+            new_deadline,
+            new_prioriteit,
+            new_status,
+            new_voltooid_op,
+            new_opmerkingen_afhandeling,
             id,
         )
 
-        my_cursor.execute(query, input_values)
+        my_cursor.execute(query_update, input_values)
         db.commit()
 
 
@@ -406,4 +465,16 @@ if __name__ == "__main__":
     patients = get_all_patients()
     for p in patients:
         print(p)
-
+        
+    # Test: update the fields 'status' and 'voltooid_op' for task d 
+    print(f"\nUpdate taak {d}: nu 'afgewerkt' en voltooid_op 29 november 2025")
+    update_task(
+        id=d,
+        status="afgewerkt",
+        voltooid_op="2025-11-29",
+    )
+    print("Alle taken voor patiënt a")
+    tasks = get_all_tasks_for_patient(a)
+    for t in tasks:
+        print(t)
+    

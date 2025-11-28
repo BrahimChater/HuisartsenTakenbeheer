@@ -15,7 +15,7 @@ def toon_menu():
     print("4. Nieuwe taak toevoegen")
 #    print("5. Patiëntgegevens aanpassen")
 #    print("6. Taak aanpassen")
-#    print("7. Exporteer alle openstaande taken naar csv")
+    print("7. Exporteer alle openstaande taken naar csv")
     print("8. Vind uniek patiëntnummer obv patiëntnaam")
     print("0. Afsluiten\n")
     print("\nMaak een keuze")
@@ -119,7 +119,22 @@ def nieuwe_taak_toevoegen():
     
     taak_id = db.add_task(patient_id, omschrijving, datum_aanmaak, deadline, prioriteit, status, voltooid_op,opmerkingen_afhandeling)
     print(f"\nTaak werd toegevoegd (of bestond al) met het unieke nummer: {taak_id}\n")
+
+#Function to adjust patient data
+#def patient_aanpassen():
+        
+#Function to adjust task data
+#def taak_aanpassen():
     
+#Function to export all current tasks to csv-file
+def openstaande_taken_naar_csv():
+    print("\nWe gaan de openstaande taken exporteren als csv-bestand")
+    export_path = input("Geef een path op waarnaar je het csv-bestand wil exporteren:\n")
+    export_path = export_path.strip()
+    if export_path =="":
+        db.export_open_tasks_to_csv()
+    else:
+        db.export_open_tasks_to_csv(export_path)
     
     
 #Function to get the patient_id based on his or her name
@@ -172,6 +187,8 @@ def main():
                 toon_alle_taken()
             elif keuze == "4":
                 nieuwe_taak_toevoegen()
+            elif keuze == "7":
+                openstaande_taken_naar_csv()
             elif keuze == "8":
                 vind_patientnummer_obv_naam()
             elif keuze =="0":

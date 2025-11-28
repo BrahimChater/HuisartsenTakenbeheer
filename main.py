@@ -16,7 +16,7 @@ def toon_menu():
 #    print("5. Patiëntgegevens aanpassen")
 #    print("6. Taak aanpassen")
 #    print("7. Exporteer alle openstaande taken naar csv")
-#    print("8. Check uniek nummer patient obv naam")
+    print("8. Vind uniek patiëntnummer obv patiëntnaam")
     print("0. Afsluiten\n")
     print("\nMaak een keuze")
 
@@ -39,7 +39,7 @@ def toevoegen_nieuwe_patient():
     print("\nVul de gegevens van de patiënt in: ")
     
     #Making sure all the input is valid, if not start over
-    naam = input("\nGeef de naam van de patiënt op: ")
+    naam = input("\nGeef de naam van de patiënt op: (familienaam voornaam) ")
     naam = naam.strip().title()
     if naam =="":
         print("Ongeldige naam opgegeven. Begin opnieuw.")
@@ -121,6 +121,31 @@ def nieuwe_taak_toevoegen():
     print(f"\nTaak werd toegevoegd (of bestond al) met het unieke nummer: {taak_id}\n")
     
     
+    
+#Function to get the patient_id based on his or her name
+def vind_patientnummer_obv_naam():
+    naam = input("Geef de naam van de patient (of een deel ervan) op (bij voorkeur familienaam voornaam): ")
+    naam = naam.strip()
+    if naam =="":
+        print("Geef een geldige naam op")
+        return
+    
+    patients_found = db.get_patients_by_name(naam)
+    if not patients_found:
+        print("Geen patiënten gevonden met deze naam")
+    elif len(patients_found) ==1:
+        pt = patients_found[0]
+        print("Eén patiënt gevonden:")
+        print(pt)
+        print(f"Uniek patiëntnummer is: {pt.id}")
+    else:
+        print("Meerdere patiënten teruggevonden:")
+        for pt in patients_found:
+            print(pt)
+            print(f"Uniek patiëntnummer is: {pt.id}")
+            print("-"*35)
+            
+        
 # Defines a main function to run the program
 def main():
     print("========= Welkom in de takenbeheertool =========")
@@ -147,6 +172,8 @@ def main():
                 toon_alle_taken()
             elif keuze == "4":
                 nieuwe_taak_toevoegen()
+            elif keuze == "8":
+                vind_patientnummer_obv_naam()
             elif keuze =="0":
                 print("\nProgramma wordt afgesloten.")
                 break

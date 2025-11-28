@@ -1,4 +1,5 @@
 from app import db #Uses the db module from the app package
+from datetime import datetime
 
 
 #Shows the main menu on the screen
@@ -11,10 +12,11 @@ def toon_menu():
     print("1. Toon alle patiënten")
     print("2. Nieuwe patiënt toevoegen")
     print("3. Toon alle taken")
-#    print("4. Nieuwe taak toevoegen")
+    print("4. Nieuwe taak toevoegen")
 #    print("5. Patiëntgegevens aanpassen")
 #    print("6. Taak aanpassen")
 #    print("7. Exporteer alle openstaande taken naar csv")
+#    print("8. Check uniek nummer patient obv naam")
     print("0. Afsluiten\n")
     print("\nMaak een keuze")
 
@@ -33,9 +35,10 @@ def toon_alle_patienten():
             print("\n" + "-" * 36 +"\n")
             
 #Funcion to add a new patient to the database
-def add_new_patient():
+def toevoegen_nieuwe_patient():
     print("\nVul de gegevens van de patiënt in: ")
     
+    #Making sure all the input is valid, if not start over
     naam = input("\nGeef de naam van de patiënt op: ")
     naam = naam.strip().title()
     if naam =="":
@@ -70,6 +73,53 @@ def toon_alle_taken():
             print(t)
     else:
         print("\nEr zitten nog geen taken in de database")
+
+#Function to add a new task to the database
+def nieuwe_taak_toevoegen(): 
+    print("\nVul de gegevens voor de taak in: ")
+    
+    #Making sure all the input is valid, if not start over or default
+    patient_id = input("\nGeef het uniek nummer van de patiënt op: ")
+    patient_id = patient_id.strip()
+    if patient_id =="" or not patient_id.isnumeric():
+        print("Ongeldig nummer opgegeven. Begin opnieuw.")
+        return
+    patient_id = int(patient_id)
+    
+    omschrijving = input("Geef een omschrijving van de taak: ")
+    omschrijving = omschrijving.strip()
+    if omschrijving =="":
+        print("Ongeldige omschrijving opgegeven. Begin opnieuw.")
+        return
+    
+    datum_aanmaak = datetime.today().strftime("%Y-%m-%d")
+    
+    deadline = input("Geef een deadline op in de vorm van YYYY-MM-DD:\n ")
+    deadline = deadline.strip()
+    try: 
+        datetime.strptime(deadline,"%Y-%m-%d")
+    except ValueError:
+        print("Ongeldige deadline opgegeven. Begin opnieuw.")
+        return
+    
+    prioriteit = input("Stel een prioriteit in: hoog, normaal, laag\n")
+    prioriteit = prioriteit.strip().lower()
+    if prioriteit not in ("hoog","laag","normaal"):
+        prioriteit ="normaal"
+        print("Ongeldige prioriteit opgegeven. De prioriteit wordt ingesteld op normaal!")
+    
+    status = "lopende"
+    
+    voltooid_op ="niet voltooid"
+    
+    opmerkingen_afhandeling = input("Geef eventuele bijkomende info op: ")
+    opmerkingen_afhandeling = opmerkingen_afhandeling.strip()
+    if opmerkingen_afhandeling =="":
+        opmerkingen_afhandeling ="/"
+    
+    taak_id = db.add_task(patient_id, omschrijving, datum_aanmaak, deadline, prioriteit, status, voltooid_op,opmerkingen_afhandeling)
+    print(f"\nTaak werd toegevoegd (of bestond al) met het unieke nummer: {taak_id}\n")
+    
     
 # Defines a main function to run the program
 def main():
@@ -87,14 +137,16 @@ def main():
         keuze = input("\nGeef het getal hier in:  ")
         keuze = keuze.strip()
     
-        #Depening on the input a different function/ action will be executed
+        #Depending on the input a different function/ action will be executed
         if keuze.isnumeric():
             if keuze == "1":
                 toon_alle_patienten()
             elif keuze == "2":
-                add_new_patient()
+                toevoegen_nieuwe_patient()
             elif keuze == "3":
                 toon_alle_taken()
+            elif keuze == "4":
+                nieuwe_taak_toevoegen()
             elif keuze =="0":
                 print("\nProgramma wordt afgesloten.")
                 break

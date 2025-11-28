@@ -396,6 +396,45 @@ def get_all_tasks_for_patient(patient_id):
 
         return tasks
 
+# Defines a function that returns all open tasks
+def get_all_open_tasks():
+    # Makes sure the database and tables exist
+    initialize_db()
+
+    #Select all open tasks from the database
+    with sqlite3.connect(db_full_path) as db:
+        my_cursor = db.cursor()
+        
+        query_open_tasks ="""
+        SELECT id, patient_id,omschrijving,datum_aanmaak,deadline,prioriteit,
+            status,voltooid_op,opmerkingen_afhandeling
+        FROM taken
+        WHERE status = "lopende"
+        ORDER BY deadline asc, prioriteit desc
+        """
+        
+        
+        my_cursor.execute(query_open_tasks)
+        rows = my_cursor.fetchall()
+        
+        #Turn each row from the selection into a Taak object and append it to a list of open tasks
+        open_tasks =[]
+        for row in rows:
+            id = row[0]
+            patient_id = row[1]
+            omschrijving = row[2]
+            datum_aanmaak = row[3]
+            deadline = row[4]
+            prioriteit = row[5]
+            status = row[6]
+            voltooid_op = row[7]
+            opmerkingen_afhandeling = row[8]
+            
+            taak = Taak(id, patient_id, omschrijving, datum_aanmaak, deadline,
+                        prioriteit, status, voltooid_op, opmerkingen_afhandeling)
+            
+            open_tasks.append(taak)
+        return open_tasks
 
 # Testing the code
 if __name__ == "__main__":
@@ -478,3 +517,8 @@ if __name__ == "__main__":
     for t in tasks:
         print(t)
     
+    # Test: print all open tasks
+    current_tasks = get_all_open_tasks()
+    print("\nOverzicht van alle lopende taken: \n")
+    for t in current_tasks:
+        print(t)

@@ -10,7 +10,7 @@ def toon_menu():
 
     print("1. Toon alle patiënten")
     print("2. Nieuwe patiënt toevoegen")
-#    print("3. Toon alle taken")
+    print("3. Toon alle taken")
 #    print("4. Nieuwe taak toevoegen")
 #    print("5. Patiëntgegevens aanpassen")
 #    print("6. Taak aanpassen")
@@ -61,7 +61,16 @@ def add_new_patient():
     
     patient_id = db.add_patient(naam, geboorte_datum, telefoon, opmerkingen)
     print(f"\nPatiënt werd toegevoegd (of bestond al) met id: {patient_id}\n")
-
+    
+#Function to show all tasks
+def toon_alle_taken():
+    alle_taken = db.get_all_tasks()
+    if alle_taken:
+        for t in alle_taken:
+            print(t)
+    else:
+        print("\nEr zitten nog geen taken in de database")
+    
 # Defines a main function to run the program
 def main():
     print("========= Welkom in de takenbeheertool =========")
@@ -84,7 +93,8 @@ def main():
                 toon_alle_patienten()
             elif keuze == "2":
                 add_new_patient()
-                
+            elif keuze == "3":
+                toon_alle_taken()
             elif keuze =="0":
                 print("\nProgramma wordt afgesloten.")
                 break

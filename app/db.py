@@ -410,8 +410,8 @@ def get_all_open_tasks():
         SELECT id, patient_id,omschrijving,datum_aanmaak,deadline,prioriteit,
             status,voltooid_op,opmerkingen_afhandeling
         FROM taken
-        WHERE status = "lopende"
-        ORDER BY deadline asc, prioriteit desc
+        WHERE status = 'lopende'
+        ORDER BY deadline ASC, prioriteit DESC
         """
         
         
@@ -447,18 +447,28 @@ def export_open_tasks_to_csv(uitvoer_path = "export/open_taken.csv"):
     if directory != "" and not os.path.exists(directory):
         os.makedirs(directory)
     
-    #Get all the open tasks
-    open_tasks = get_all_open_tasks()
+    #Get all the open tasks with the patient name
+    with sqlite3.connect(db_full_path) as db:
+        my_cursor = db.cursor()
+        query = """
+        SELECT t.id, p.naam, t.patient_id,t.omschrijving,t.datum_aanmaak,t.deadline,t.prioriteit,
+            t.opmerkingen_afhandeling
+        FROM taken t
+        INNER JOIN patienten p ON t.patient_id = p.id
+        WHERE t.status = 'lopende'
+        ORDER BY t.deadline ASC, t.prioriteit DESC
+        """
+        
+        my_cursor.execute(query)
+        open_tasks = my_cursor.fetchall()
     
     # Write the open tasks to a csv file one after the other
     with open(uitvoer_path, 'w', newline="", encoding='utf-8') as f_out:
         my_Writer = csv.writer(f_out, delimiter=",")
-        header = ("Id","Patient_id", "Omschrijving","Aangemaakt op", "Deadline", "Prioriteit", "Opmerkingen / Afhandeling")
+        header = ("Taak Nummer","Patient Naam", "Patient_id", "Omschrijving","Aangemaakt op", "Deadline", "Prioriteit", "Opmerkingen / Afhandeling")
         my_Writer.writerow(header)
         for t in open_tasks:
-            line = (t.id, t.patient_id, t.omschrijving,t.datum_aanmaak,t.deadline,t.prioriteit,
-                    t.opmerkingen_afhandeling)
-            my_Writer.writerow(line)
+            my_Writer.writerow(t)
     print(f"Openstaande taken geëxporteerd naar: {uitvoer_path}")
 
 # Testing the code

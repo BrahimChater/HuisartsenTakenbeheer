@@ -208,6 +208,35 @@ def get_all_patients():
 
         return patients
 
+#Function to get patients based on the name of the patient
+def get_patients_by_name(naam):
+    # Makes sure the database and tables exist
+    initialize_db()
+
+    #Query to find all names that contain the input
+    with sqlite3.connect(db_full_path) as db:
+        my_cursor = db.cursor()
+        
+        query="""
+        SELECT id, naam, geboorte_datum, telefoon, opmerkingen
+        FROM patienten
+        WHERE LOWER (naam) LIKE LOWER (?)
+        ORDER BY naam, geboorte_datum
+        """
+        
+        input_name = (f"%{naam}%",)
+
+        my_cursor.execute(query,input_name)
+        rows = my_cursor.fetchall()
+        
+        found_patients =[]
+        for r in rows:
+            
+            p = Patient(r[0],r[1],r[2],r[3],r[4])            
+            found_patients.append(p)
+        
+        return found_patients
+        
 
 # Defines a function to add a task to the database
 def add_task(patient_id, omschrijving, datum_aanmaak, deadline, prioriteit="normaal", status="lopende", voltooid_op="niet voltooid", opmerkingen_afhandeling="/"):

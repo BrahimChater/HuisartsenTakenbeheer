@@ -8,14 +8,14 @@ def toon_menu():
     print("\n===========================================\n") 
 
 
-    print("\n1. Toon alle patiënten")
-#    print("2. Nieuwe patiënt toevoegen")
+    print("1. Toon alle patiënten")
+    print("2. Nieuwe patiënt toevoegen")
 #    print("3. Toon alle taken")
 #    print("4. Nieuwe taak toevoegen")
 #    print("5. Patiëntgegevens aanpassen")
 #    print("6. Taak aanpassen")
 #    print("7. Exporteer alle openstaande taken naar csv")
-#    print("0. Afsluiten\n")
+    print("0. Afsluiten\n")
     print("\nMaak een keuze")
 
 
@@ -31,7 +31,36 @@ def toon_alle_patienten():
         for p in patienten:
             print(p)
             print("\n" + "-" * 36 +"\n")
+            
+#Funcion to add a new patient to the database
+def add_new_patient():
+    print("\nVul de gegevens van de patiënt in: ")
     
+    naam = input("\nGeef de naam van de patiënt op: ")
+    naam = naam.strip().title()
+    if naam =="":
+        print("Ongeldige naam opgegeven. Begin opnieuw.")
+        return
+    
+    geboorte_datum = input("Geef de geboortedatum van de patiënt (YYYY-MM-DD): ")
+    geboorte_datum = geboorte_datum.strip()
+    if geboorte_datum =="":
+        print("Ongeldige geboortedatum opgegeven. Begin opnieuw.")
+        return
+    
+    telefoon = input("Geef het telefoonnummer van de patiënt op: ")
+    telefoon = telefoon.strip()
+    if telefoon =="":
+        print("Ongeldig nummer opgegeven. Begin opnieuw.")
+        return
+    
+    opmerkingen = input("Geef eventuele bijkomende info over de patiënt op: ")
+    opmerkingen = opmerkingen.strip()
+    if opmerkingen =="":
+        opmerkingen ="/"
+    
+    patient_id = db.add_patient(naam, geboorte_datum, telefoon, opmerkingen)
+    print(f"\nPatiënt werd toegevoegd (of bestond al) met id: {patient_id}\n")
 
 # Defines a main function to run the program
 def main():
@@ -53,8 +82,14 @@ def main():
         if keuze.isnumeric():
             if keuze == "1":
                 toon_alle_patienten()
-            else:
+            elif keuze == "2":
+                add_new_patient()
+                
+            elif keuze =="0":
+                print("\nProgramma wordt afgesloten.")
                 break
+            else:
+                print("\nGeef een geldig getal op!")
         else:
             print("\nOngeldige keuze ingegeven. Probeer opnieuw!")
     

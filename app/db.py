@@ -1,5 +1,6 @@
 import sqlite3
 import os
+import csv
 from models import Patient, Taak
 
 # Assigns the desired database folder, file and full path to a variable
@@ -436,6 +437,30 @@ def get_all_open_tasks():
             open_tasks.append(taak)
         return open_tasks
 
+# Defines a function to export the open tasks to a csv-file
+def export_open_tasks_to_csv(uitvoer_path = "export/open_taken.csv"):
+    # Makes sure the database and tables exist
+    initialize_db()
+    
+    # Make sure the export directory exists
+    directory = os.path.dirname(uitvoer_path)
+    if directory != "" and not os.path.exists(directory):
+        os.makedirs(directory)
+    
+    #Get all the open tasks
+    open_tasks = get_all_open_tasks()
+    
+    # Write the open tasks to a csv file one after the other
+    with open(uitvoer_path, 'w', newline="", encoding='utf-8') as f_out:
+        my_Writer = csv.writer(f_out, delimiter=",")
+        header = ("Id","Patient_id", "Omschrijving","Aangemaakt op", "Deadline", "Prioriteit", "Opmerkingen / Afhandeling")
+        my_Writer.writerow(header)
+        for t in open_tasks:
+            line = (t.id, t.patient_id, t.omschrijving,t.datum_aanmaak,t.deadline,t.prioriteit,
+                    t.opmerkingen_afhandeling)
+            my_Writer.writerow(line)
+    print(f"Openstaande taken geëxporteerd naar: {uitvoer_path}")
+
 # Testing the code
 if __name__ == "__main__":
     
@@ -522,3 +547,7 @@ if __name__ == "__main__":
     print("\nOverzicht van alle lopende taken: \n")
     for t in current_tasks:
         print(t)
+        
+    # Test export to csv file
+    
+    export_open_tasks_to_csv()

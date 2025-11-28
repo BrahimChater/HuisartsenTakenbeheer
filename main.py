@@ -13,7 +13,7 @@ def toon_menu():
     print("2. Nieuwe patiënt toevoegen")
     print("3. Toon alle taken")
     print("4. Nieuwe taak toevoegen")
-#    print("5. Patiëntgegevens aanpassen")
+    print("5. Patiëntgegevens aanpassen")
 #    print("6. Taak aanpassen")
     print("7. Exporteer alle openstaande taken naar csv")
     print("8. Vind uniek patiëntnummer obv patiëntnaam")
@@ -50,7 +50,13 @@ def toevoegen_nieuwe_patient():
     if geboorte_datum =="":
         print("Ongeldige geboortedatum opgegeven. Begin opnieuw.")
         return
-    
+    else:
+        try:
+            datetime.strptime(geboorte_datum, "%Y-%m-%d")
+        except ValueError:
+            print("Ongeldige geboortedatum opgegeven. Begin opnieuw.")
+            return
+        
     telefoon = input("Geef het telefoonnummer van de patiënt op: ")
     telefoon = telefoon.strip()
     if telefoon =="":
@@ -121,8 +127,55 @@ def nieuwe_taak_toevoegen():
     print(f"\nTaak werd toegevoegd (of bestond al) met het unieke nummer: {taak_id}\n")
 
 #Function to adjust patient data
-#def patient_aanpassen():
-        
+def patient_aanpassen():
+    
+    print("\nU kan hier de patiëntgegevens aanpassen")
+    
+    patient_id = input("Geef het uniek patiëntnummer van de patiënt die u wil aanpassen: ")
+    patient_id = patient_id.strip()
+    if patient_id == "" or not patient_id.isnumeric():
+        print("Ongeldig patiëntnummer.")
+        return
+    patient_id = int(patient_id)
+
+    print("\nGeef niets op als u niets wil wijzigen.\n")
+    nieuwe_naam = input("Nieuwe naam (familienaam voornaam): ")
+    nieuwe_naam= nieuwe_naam.strip().title()
+    if nieuwe_naam == "":
+        nieuwe_naam = None
+
+    nieuwe_geboorte_datum = input("Nieuwe geboortedatum (YYYY-MM-DD, leeg = geen wijziging): ")
+    nieuwe_geboorte_datum = nieuwe_geboorte_datum.strip()
+    if nieuwe_geboorte_datum == "":
+        nieuwe_geboorte_datum = None
+    else:
+        try:
+            datetime.strptime(nieuwe_geboorte_datum, "%Y-%m-%d")
+        except ValueError:
+            print("Ongeldige geboortedatum. Wijziging geboortedatum niet doorgevoerd.")
+            nieuwe_geboorte_datum = None
+
+    nieuwe_telefoon = input("Nieuw telefoonnummer (leeg = geen wijziging): ")
+    nieuwe_telefoon = nieuwe_telefoon.strip()
+    if nieuwe_telefoon == "":
+        nieuwe_telefoon = None
+
+    nieuwe_opmerkingen = input("Nieuwe opmerkingen (leeg = geen wijziging): ")
+    nieuwe_opmerkingen=nieuwe_opmerkingen.strip()
+    if nieuwe_opmerkingen == "":
+        nieuwe_opmerkingen = None
+
+    db.update_patient(
+        id=patient_id,
+        naam=nieuwe_naam,
+        geboorte_datum=nieuwe_geboorte_datum,
+        telefoon=nieuwe_telefoon,
+        opmerkingen=nieuwe_opmerkingen,
+    )
+
+    print(f"\nPatiënt met nummer {patient_id} werd bijgewerkt.\n")
+    
+    
 #Function to adjust task data
 #def taak_aanpassen():
     
@@ -187,6 +240,10 @@ def main():
                 toon_alle_taken()
             elif keuze == "4":
                 nieuwe_taak_toevoegen()
+            elif keuze == "5":
+                patient_aanpassen()
+           # elif keuze == "6":
+           #     taak_aanpassen()
             elif keuze == "7":
                 openstaande_taken_naar_csv()
             elif keuze == "8":

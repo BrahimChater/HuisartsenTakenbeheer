@@ -1,7 +1,7 @@
 import sqlite3
 import os
 import csv
-from models import Patient, Taak
+from .models import Patient, Taak
 
 # Assigns the desired database folder, file and full path to a variable
 db_path = "data"
@@ -47,7 +47,7 @@ def initialize_db():
             omschrijving TEXT NOT NULL,
             datum_aanmaak TEXT,
             prioriteit TEXT DEFAULT 'normaal',
-            deadline TEXT,
+            deadline TEXT NOT NULL,
             status TEXT NOT NULL DEFAULT 'lopende',
             voltooid_op TEXT,
             opmerkingen_afhandeling TEXT,
@@ -349,6 +349,50 @@ def update_task(id, patient_id=None, omschrijving=None, datum_aanmaak=None, dead
         my_cursor.execute(query_update, input_values)
         db.commit()
 
+# Defines a function to get all tasks from the database
+def get_all_tasks():
+    # Makes sure the database and tables exist
+    initialize_db()
+
+    # Select all task entries for a patient, fetch them and return them as a list of task objects
+
+    with sqlite3.connect(db_full_path) as db:
+        my_cursor = db.cursor()
+        query = """
+        SELECT id, patient_id, omschrijving, datum_aanmaak,
+        deadline, prioriteit, status, voltooid_op, opmerkingen_afhandeling
+        FROM taken
+        """
+
+        my_cursor.execute(query)
+        rows = my_cursor.fetchall()
+
+        tasks = []
+        for row in rows:
+            id = row[0]
+            patient_id = row[1]
+            omschrijving = row[2]
+            datum_aanmaak = row[3]
+            deadline = row[4]
+            prioriteit = row[5]
+            status = row[6]
+            voltooid_op = row[7]
+            opmerkingen_afhandeling = row[8]
+
+            taak = Taak(
+                id,
+                patient_id,
+                omschrijving,
+                datum_aanmaak,
+                deadline,
+                prioriteit,
+                status,
+                voltooid_op,
+                opmerkingen_afhandeling,
+            )
+            tasks.append(taak)
+
+        return tasks
 
 # Defines a function to get all tasks for a patient from the database and return them as a list of task objects
 def get_all_tasks_for_patient(patient_id):
@@ -411,7 +455,7 @@ def get_all_open_tasks():
             status,voltooid_op,opmerkingen_afhandeling
         FROM taken
         WHERE status = 'lopende'
-        ORDER BY deadline ASC, prioriteit DESC
+        ORDER BY deadline ASC
         """
         
         
@@ -456,7 +500,7 @@ def export_open_tasks_to_csv(uitvoer_path = "export/open_taken.csv"):
         FROM taken t
         INNER JOIN patienten p ON t.patient_id = p.id
         WHERE t.status = 'lopende'
-        ORDER BY t.deadline ASC, t.prioriteit DESC
+        ORDER BY t.deadline ASC
         """
         
         my_cursor.execute(query)
@@ -471,6 +515,7 @@ def export_open_tasks_to_csv(uitvoer_path = "export/open_taken.csv"):
             my_Writer.writerow(t)
     print(f"Openstaande taken geëxporteerd naar: {uitvoer_path}")
 
+"""
 # Testing the code
 if __name__ == "__main__":
     
@@ -561,3 +606,4 @@ if __name__ == "__main__":
     # Test export to csv file
     
     export_open_tasks_to_csv()
+    """

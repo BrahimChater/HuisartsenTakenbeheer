@@ -87,7 +87,7 @@ def add_patient(naam, geboorte_datum, telefoon, opmerkingen="/"):
 
         # If the patient already exists, the id of the existing one is returned
         if existing_patient is not None:
-            print("Deze patient zit al in de database! Er wordt niks toegevoegd.")
+            print("\nDeze patient zit al in de database! Er wordt niks toegevoegd.")
             return existing_patient[0]
 
         # If the patient doesn't exist then a new entry is created and its id returned
@@ -131,7 +131,7 @@ def update_patient(id, naam=None, geboorte_datum=None, telefoon=None, opmerkinge
         selected_row = my_cursor.fetchone()
 
         if selected_row is None:
-            print("Geen patient gevonden met dit id!")
+            print("\nGeen patient gevonden met dit id!")
             return None
 
         # 2. Fill in the new updated values
@@ -260,7 +260,7 @@ def add_task(patient_id, omschrijving, datum_aanmaak, deadline, prioriteit="norm
 
         # If the task exists return its id
         if existing_task is not None:
-            print('Deze taak werd reeds ingevoerd.')
+            print('\nDeze taak werd reeds ingevoerd.')
             return existing_task[0]
         # If the task doesnt exist, created it and return its id
         else:

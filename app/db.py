@@ -3,9 +3,19 @@ import os
 import csv
 from .models import Patient, Taak
 
+# Import settings from settings.py. If it fails, use default values
+try:
+    from settings import db_set_dir, db_set_file,export_set_dir
+except ImportError:
+    db_set_dir = "data"
+    db_set_file = "task_manager.db"
+    export_set_dir = "export"
+
+
 # Assigns the desired database folder, file and full path to a variable
-db_path = "data"
-db_file = "task_manager.db"
+db_path = db_set_dir
+db_file = db_set_file
+
 
 #Testdb
 #db_path ="test/data"
@@ -247,15 +257,32 @@ def add_task(patient_id, omschrijving, datum_aanmaak, deadline, prioriteit="norm
     with sqlite3.connect(db_full_path) as db:
         my_cursor = db.cursor()
 
+        # Check if the patient exists
+        check_patient_query = """
+        SELECT id
+        FROM patienten
+        WHERE id = ?
+        """
+        
+        input_value = (patient_id,)
+        
+        my_cursor.execute(check_patient_query, input_value) 
+        existing_patient = my_cursor.fetchone()
+
+        if existing_patient is None:
+            print("\nGeen patiënt gevonden met dit id. Taak werd niet toegevoegd.")
+            return None
+
+
         # Check if task doesnt exist yet
-        check_query = """
+        check_task_query = """
         SELECT id
         FROM taken
         WHERE patient_id = ? AND datum_aanmaak = ? AND omschrijving = ?
         """
 
         check_values = (patient_id, datum_aanmaak, omschrijving)
-        my_cursor.execute(check_query, check_values)
+        my_cursor.execute(check_task_query, check_values)
         existing_task = my_cursor.fetchone()
 
         # If the task exists return its id
@@ -511,9 +538,15 @@ def get_all_open_tasks():
         return open_tasks
 
 # Defines a function to export the open tasks to a csv-file
-def export_open_tasks_to_csv(uitvoer_path = "export/open_taken.csv"):
+def export_open_tasks_to_csv(uitvoer_path = None):
     # Makes sure the database and tables exist
     initialize_db()
+    
+    # If no path is given, use export_set_dir/open_taken.csv
+    if uitvoer_path is None:
+        if not os.path.exists(export_set_dir):
+            os.makedirs(export_set_dir)
+        uitvoer_path = os.path.join(export_set_dir, "open_taken.csv")
     
     # Make sure the export directory exists
     directory = os.path.dirname(uitvoer_path)

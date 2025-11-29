@@ -125,7 +125,10 @@ def nieuwe_taak_toevoegen():
         opmerkingen_afhandeling ="/"
     
     taak_id = db.add_task(patient_id, omschrijving, datum_aanmaak, deadline, prioriteit, status, voltooid_op,opmerkingen_afhandeling)
-    print(f"\nTaak werd toegevoegd (of bestond al) met het unieke nummer: {taak_id}\n")
+    if taak_id is None:
+        print("\nDe taak werd niet opgeslagen.\n")
+    else:
+        print(f"\nTaak werd toegevoegd (of bestond al) met het unieke nummer: {taak_id}\n")
 
 #Function to adjust patient data
 def patient_aanpassen():
@@ -249,12 +252,12 @@ def taak_aanpassen():
 #Function to export all current tasks to csv-file
 def openstaande_taken_naar_csv():
     print("\nWe gaan de openstaande taken exporteren als csv-bestand")
-    export_path = input("Geef een naam (zonder extensie) op waarnaar je het csv-bestand wil exporteren:\n")
+    export_path = input("Geef een naam (zonder extensie) voor het csv-bestand dat je wil exporteren (evt met folder):\n")
     export_path = export_path.strip()
     if export_path =="":
         db.export_open_tasks_to_csv()
     else:
-        db.export_open_tasks_to_csv(export_path)
+        db.export_open_tasks_to_csv(export_path +".csv")
     
     
 #Function to get the patient_id based on his or her name

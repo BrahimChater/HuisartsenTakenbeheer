@@ -14,7 +14,7 @@ def toon_menu():
     print("3. Toon alle taken")
     print("4. Nieuwe taak toevoegen")
     print("5. Patiëntgegevens aanpassen")
-#    print("6. Taak aanpassen")
+    print("6. Taak aanpassen")
     print("7. Exporteer alle openstaande taken naar csv")
     print("8. Vind uniek patiëntnummer obv patiëntnaam")
     print("0. Afsluiten\n")
@@ -75,6 +75,7 @@ def toevoegen_nieuwe_patient():
 def toon_alle_taken():
     alle_taken = db.get_all_tasks()
     if alle_taken:
+        print("\nOverzicht van alle taken in de database:\n")
         for t in alle_taken:
             print(t)
     else:
@@ -173,16 +174,82 @@ def patient_aanpassen():
         opmerkingen=nieuwe_opmerkingen,
     )
 
-    print(f"\nPatiënt met nummer {patient_id} werd bijgewerkt.\n")
+    print(f"\nBewerking voltooid.\n")
     
     
 #Function to adjust task data
-#def taak_aanpassen():
-    
+def taak_aanpassen():
+
+    print("\nTaak aanpassen")
+    taak_id = input("Geef het unieke nummer van de taak: ")
+    taak_id = taak_id.strip()
+    if taak_id == "" or not taak_id.isnumeric():
+        print("Ongeldig taaknummer.")
+        return
+    taak_id = int(taak_id)
+
+    print("\nLaat een veld leeg als je het niet wil wijzigen.\n")
+
+    nieuwe_omschrijving = input("Nieuwe omschrijving (leeg = geen wijziging): ")
+    nieuwe_omschrijving = nieuwe_omschrijving.strip()
+    if nieuwe_omschrijving == "":
+        nieuwe_omschrijving = None
+
+    nieuwe_deadline = input("Nieuwe deadline (YYYY-MM-DD, leeg = geen wijziging): ")
+    nieuwe_deadline = nieuwe_deadline.strip()
+    if nieuwe_deadline == "":
+        nieuwe_deadline = None
+    else:
+        try:
+            datetime.strptime(nieuwe_deadline, "%Y-%m-%d")
+        except ValueError:
+            print("Ongeldige deadline. Wijziging deadline niet doorgevoerd.")
+            nieuwe_deadline = None
+
+    nieuwe_prioriteit = input("Nieuwe prioriteit (hoog/normaal/laag, leeg = geen wijziging): ")
+    nieuwe_prioriteit = nieuwe_prioriteit.strip().lower()
+    if nieuwe_prioriteit == "":
+        nieuwe_prioriteit = None
+    elif nieuwe_prioriteit not in ("hoog", "normaal", "laag"):
+        print("Ongeldige prioriteit. Wijziging prioriteit niet doorgevoerd.")
+        nieuwe_prioriteit = None
+
+    nieuwe_status = input("Nieuwe status (lopende/afgewerkt, leeg = geen wijziging): ")
+    nieuwe_status = nieuwe_status.strip().lower()
+    if nieuwe_status == "":
+        nieuwe_status = None
+    elif nieuwe_status not in ("lopende", "afgewerkt"):
+        print("Ongeldige status. Wijziging status wordt genegeerd.")
+        nieuwe_status = None
+
+    nieuwe_opmerkingen_afhandeling = input(
+        "Nieuwe opmerkingen/afhandeling (leeg = geen wijziging): ")
+    nieuwe_opmerkingen_afhandeling = nieuwe_opmerkingen_afhandeling.strip()
+    if nieuwe_opmerkingen_afhandeling == "":
+        nieuwe_opmerkingen_afhandeling = None
+
+    nieuwe_voltooid_op = None
+    if nieuwe_status == "afgewerkt":
+        nieuwe_voltooid_op = datetime.today().strftime("%Y-%m-%d")
+    elif nieuwe_status == "lopende":
+        nieuwe_voltooid_op = "niet voltooid"
+   
+    db.update_task(
+        id=taak_id,
+        omschrijving=nieuwe_omschrijving,
+        deadline=nieuwe_deadline,
+        prioriteit=nieuwe_prioriteit,
+        status=nieuwe_status,
+        voltooid_op=nieuwe_voltooid_op,
+        opmerkingen_afhandeling=nieuwe_opmerkingen_afhandeling,
+    )
+
+    print("\nTaak werd bijgewerkt.\n")
+
 #Function to export all current tasks to csv-file
 def openstaande_taken_naar_csv():
     print("\nWe gaan de openstaande taken exporteren als csv-bestand")
-    export_path = input("Geef een path op waarnaar je het csv-bestand wil exporteren:\n")
+    export_path = input("Geef een naam (zonder extensie) op waarnaar je het csv-bestand wil exporteren:\n")
     export_path = export_path.strip()
     if export_path =="":
         db.export_open_tasks_to_csv()
@@ -200,10 +267,10 @@ def vind_patientnummer_obv_naam():
     
     patients_found = db.get_patients_by_name(naam)
     if not patients_found:
-        print("Geen patiënten gevonden met deze naam")
+        print("\nGeen patiënten gevonden met deze naam")
     elif len(patients_found) ==1:
         pt = patients_found[0]
-        print("Eén patiënt gevonden:")
+        print("\nEén patiënt gevonden:")
         print(pt)
         print(f"Uniek patiëntnummer is: {pt.id}")
     else:
@@ -242,8 +309,8 @@ def main():
                 nieuwe_taak_toevoegen()
             elif keuze == "5":
                 patient_aanpassen()
-           # elif keuze == "6":
-           #     taak_aanpassen()
+            elif keuze == "6":
+                taak_aanpassen()
             elif keuze == "7":
                 openstaande_taken_naar_csv()
             elif keuze == "8":

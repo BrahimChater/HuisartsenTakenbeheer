@@ -1,4 +1,19 @@
 # Virtual environment
 venv/
+.venv/
 
+# Configuration File
+settings.py
 
+# Database Files
+task_manager.db
+*.db
+
+#Python cache /compiled files
+__pycache__/ 
+*.pyc
+*.py[cod]
+
+# Exported reports
+export/
+*.csv

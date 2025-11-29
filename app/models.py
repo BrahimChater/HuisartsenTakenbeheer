@@ -9,7 +9,7 @@ class Patient:
         
     def __str__(self):
         return (
-                f"({self.id}) {self.naam} (geb. {self.geboorte_datum}, tel. {self.telefoon})\n"
+                f"(ID: {self.id}) {self.naam} (geb. {self.geboorte_datum}, tel. {self.telefoon})\n"
                 f"(info: {self.opmerkingen})"
             )
                  
@@ -40,13 +40,14 @@ class Taak:
         
     def __str__(self):
         return (
-           f"Taak: {self.id}, (mbt patiënt {self.patient_id}) | Aangemaakt op: {self.datum_aanmaak}\n"
+           f"Taak: {self.id}, (mbt patiënt met ID {self.patient_id}) | Aangemaakt op: {self.datum_aanmaak}\n"
            f"Omschrijving: {self.omschrijving}\n"
            f"Deadline: {self.deadline} | prioriteit: {self.prioriteit} | status: {self.status}\n"
            f"Voltooid op: {self.voltooid_op}\n"
            f"Conclusie: {self.opmerkingen_afhandeling}\n"
         )
            
+        
 if __name__ =="__main__":
    # Kleine test
    p = Patient(1, "Patient Zero", "1980-01-01", "0123456789", "Benzodependentie")

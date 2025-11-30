@@ -223,7 +223,7 @@ def get_patients_by_name(naam):
     # Makes sure the database and tables exist
     initialize_db()
 
-    #Query to find all names that contain the input
+    #Query to find all patients that contain the input
     with sqlite3.connect(db_full_path) as db:
         my_cursor = db.cursor()
         
@@ -246,6 +246,32 @@ def get_patients_by_name(naam):
             found_patients.append(p)
         
         return found_patients
+
+#Function to get patients based on the id of the patient
+def get_patient_by_id(patient_id):
+    # Makes sure the database and tables exist
+    initialize_db()
+
+    #Query to find the patient with the input id
+    with sqlite3.connect(db_full_path) as db:
+        my_cursor = db.cursor()
+        query = """
+        SELECT id, naam, geboorte_datum, telefoon, opmerkingen
+        FROM patienten
+        WHERE id = ?
+        """
+        
+        input_id = (patient_id,)
+        
+        my_cursor.execute(query, input_id)
+        row = my_cursor.fetchone()
+
+        if row is None:
+            return None
+
+        p = Patient(row[0], row[1], row[2], row[3], row[4])
+
+        return p
         
 
 # Defines a function to add a task to the database

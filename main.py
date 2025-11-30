@@ -78,7 +78,13 @@ def toon_alle_taken():
     if alle_taken:
         print("\nOverzicht van alle taken in de database:\n")
         for t in alle_taken:
+            patient = db.get_patient_by_id(t.patient_id)
+            if patient:
+                print(f"Patiënt: {patient.naam} (ID: {patient.id})")
+            else: # normally with the current code this should never happen
+                print(f"Patiënt: [onbekend] (ID: {t.patient_id})")
             print(t)
+            print("-"*40)
     else:
         print("\nEr zitten nog geen taken in de database")
         
@@ -89,7 +95,13 @@ def toon_alle_openstaande_taken():
     if alle_taken:
         print("\nOverzicht van alle openstaande taken in de database:\n")
         for t in alle_taken:
+            patient = db.get_patient_by_id(t.patient_id)
+            if patient:
+                print(f"Patiënt: {patient.naam} (ID: {patient.id})")
+            else: # normally with the current code this should never happen
+                print(f"Patiënt: [onbekend] (ID: {t.patient_id})")
             print(t)
+            print("-"*40)
     else:
         print("\nEr zijn geen openstaande taken in de database")
 

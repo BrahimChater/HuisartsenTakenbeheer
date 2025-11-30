@@ -12,11 +12,12 @@ def toon_menu():
     print("1. Toon alle patiënten")
     print("2. Nieuwe patiënt toevoegen")
     print("3. Toon alle taken")
-    print("4. Nieuwe taak toevoegen")
-    print("5. Patiëntgegevens aanpassen")
-    print("6. Taak aanpassen")
-    print("7. Exporteer alle openstaande taken naar csv")
-    print("8. Vind uniek patiëntnummer obv patiëntnaam")
+    print("4. Toon alle openstaande taken")
+    print("5. Nieuwe taak toevoegen")
+    print("6. Patiëntgegevens aanpassen")
+    print("7. Taak aanpassen")
+    print("8. Exporteer alle openstaande taken naar csv")
+    print("9. Vind uniek patiëntnummer obv patiëntnaam")
     print("0. Afsluiten\n")
     print("\nMaak een keuze")
 
@@ -80,6 +81,18 @@ def toon_alle_taken():
             print(t)
     else:
         print("\nEr zitten nog geen taken in de database")
+        
+        
+#Function to show all currently unfinished tasks
+def toon_alle_openstaande_taken():
+    alle_taken = db.get_all_open_tasks()
+    if alle_taken:
+        print("\nOverzicht van alle openstaande taken in de database:\n")
+        for t in alle_taken:
+            print(t)
+    else:
+        print("\nEr zijn geen openstaande taken in de database")
+
 
 #Function to add a new task to the database
 def nieuwe_taak_toevoegen(): 
@@ -177,7 +190,7 @@ def patient_aanpassen():
         opmerkingen=nieuwe_opmerkingen,
     )
 
-    print(f"\nBewerking voltooid.\n")
+    print("\nBewerking voltooid.\n")
     
     
 #Function to adjust task data
@@ -290,7 +303,7 @@ def main():
     
     # Make sure the database and its tables exists
     db.initialize_db()
-    print(f"\n*** Database is geïnitialiseerd ***\n")
+    print("\n*** Database is geïnitialiseerd ***\n")
     
     
     #Create a loop to show the main menu
@@ -309,14 +322,16 @@ def main():
             elif keuze == "3":
                 toon_alle_taken()
             elif keuze == "4":
-                nieuwe_taak_toevoegen()
+                toon_alle_openstaande_taken()
             elif keuze == "5":
-                patient_aanpassen()
+                nieuwe_taak_toevoegen()
             elif keuze == "6":
-                taak_aanpassen()
+                patient_aanpassen()
             elif keuze == "7":
-                openstaande_taken_naar_csv()
+                taak_aanpassen()
             elif keuze == "8":
+                openstaande_taken_naar_csv()
+            elif keuze == "9":
                 vind_patientnummer_obv_naam()
             elif keuze =="0":
                 print("\nProgramma wordt afgesloten.")

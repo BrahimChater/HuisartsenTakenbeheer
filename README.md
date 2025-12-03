@@ -270,6 +270,7 @@ Pas indien gewenst "db_set_dir", "db_set_file" of "export_set_dir" aan in "setti
 
 Met de standaardinstellingen moet de structuur er ongeveer zo uitzien:
 
+```
 projectroot/
 ├─ main.py
 ├─ app/
@@ -282,9 +283,9 @@ projectroot/
 ├─ data/
 │  └─ task_manager.db
 └─ export/
+```
 
-
-*NB: De map `export/` wordt pas automatisch aangemaakt bij de eerste CSV-export. Tenzij door de gebruiker anders aangegeven.*
+*NB: De map "export/" wordt pas automatisch aangemaakt bij de eerste CSV-export. Tenzij door de gebruiker anders aangegeven.*
 
 
 6. Applicatie starten

@@ -271,6 +271,7 @@ If desired, adjust "db_set_dir", "db_set_file" or "export_set_dir" in "settings.
 
 With the default settings, the structure should look something like this:
 
+```
 projectroot/
 ├─ main.py
 ├─ app/
@@ -283,7 +284,7 @@ projectroot/
 ├─ data/
 │  └─ task_manager.db
 └─ export/
-
+```
 
 Note: the "export/" folder is created automatically on the first CSV export, unless the user specifies another location.
 

@@ -17,7 +17,7 @@ def toon_menu():
     print("6. Patiëntgegevens aanpassen")
     print("7. Taak aanpassen")
     print("8. Exporteer alle openstaande taken naar csv")
-    print("9. Vind uniek patiëntnummer obv patiëntnaam")
+    print("9. Zoek patiënt en diens uniek patiëntnummer obv de naam")
     print("0. Afsluiten\n")
     print("\nMaak een keuze")
 
@@ -34,7 +34,7 @@ def toon_alle_patienten():
         for p in patienten:
             print(p)
             print("\n" + "-" * 36 +"\n")
-            
+    
 #Funcion to add a new patient to the database
 def toevoegen_nieuwe_patient():
     print("\nVul de gegevens van de patiënt in: ")
@@ -42,7 +42,7 @@ def toevoegen_nieuwe_patient():
     #Making sure all the input is valid, if not start over
     naam = input("\nGeef de naam van de patiënt op: (familienaam voornaam) ")
     naam = naam.strip().title()
-    if naam =="":
+    if naam =="" or naam.isnumeric():
         print("Ongeldige naam opgegeven. Begin opnieuw.")
         return
     
@@ -170,7 +170,7 @@ def patient_aanpassen():
     print("\nGeef niets op als u niets wil wijzigen.\n")
     nieuwe_naam = input("Nieuwe naam (familienaam voornaam): ")
     nieuwe_naam= nieuwe_naam.strip().title()
-    if nieuwe_naam == "":
+    if nieuwe_naam == "" or nieuwe_naam.isnumeric():
         nieuwe_naam = None
 
     nieuwe_geboorte_datum = input("Nieuwe geboortedatum (YYYY-MM-DD, leeg = geen wijziging): ")
@@ -307,7 +307,10 @@ def vind_patientnummer_obv_naam():
             print(pt)
             print(f"Uniek patiëntnummer is: {pt.id}")
             print("-"*35)
-            
+
+# Function to return to main menu
+def return_to_main_menu():
+    input("\nDruk op Enter om terug te keren naar het hoofdmenu...")            
         
 # Defines a main function to run the program
 def main():
@@ -329,22 +332,31 @@ def main():
         if keuze.isnumeric():
             if keuze == "1":
                 toon_alle_patienten()
+                return_to_main_menu()
             elif keuze == "2":
                 toevoegen_nieuwe_patient()
+                return_to_main_menu()
             elif keuze == "3":
                 toon_alle_taken()
+                return_to_main_menu()
             elif keuze == "4":
                 toon_alle_openstaande_taken()
+                return_to_main_menu()
             elif keuze == "5":
                 nieuwe_taak_toevoegen()
+                return_to_main_menu()
             elif keuze == "6":
                 patient_aanpassen()
+                return_to_main_menu()
             elif keuze == "7":
                 taak_aanpassen()
+                return_to_main_menu()
             elif keuze == "8":
                 openstaande_taken_naar_csv()
+                return_to_main_menu()
             elif keuze == "9":
                 vind_patientnummer_obv_naam()
+                return_to_main_menu()
             elif keuze =="0":
                 print("\nProgramma wordt afgesloten.")
                 break

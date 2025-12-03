@@ -200,6 +200,7 @@ def get_all_patients():
         my_cursor = db.cursor()
         query = """
         SELECT id, naam, geboorte_datum, telefoon, opmerkingen FROM patienten
+        ORDER BY id
         """
 
         my_cursor.execute(query)
@@ -444,6 +445,7 @@ def get_all_tasks():
         SELECT id, patient_id, omschrijving, datum_aanmaak,
         deadline, prioriteit, status, voltooid_op, opmerkingen_afhandeling
         FROM taken
+        ORDER BY deadline ASC
         """
 
         my_cursor.execute(query)
